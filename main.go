@@ -7,30 +7,35 @@ import (
 	"net/http"
 
 	"github.com/go-redis/redis"
+	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"
 )
 
 func main() {
 	router := newRouter()
-	http.HandleFunc("/redis", router.handler)
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	router.HandleFunc("/", router.handler)
+	log.Fatal(http.ListenAndServe(":8080", router))
 }
 
 type Router struct {
+	*mux.Router
 	redis *redis.Client
 	pg    *sql.DB
 }
 
 func newRouter() *Router {
+	r := mux.NewRouter()
+
 	redis := redis.NewClient(&redis.Options{
 		Addr: "redis:6379",
 	})
+
 	pg, err := sql.Open("postgres", "host=postgres user=postgres dbname=postgres sslmode=disable")
 	if err != nil {
 		panic(err)
 	}
 
-	return &Router{redis, pg}
+	return &Router{r, redis, pg}
 }
 
 func (r *Router) handler(w http.ResponseWriter, req *http.Request) {
@@ -46,6 +51,6 @@ func (r *Router) handler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	// Return the result
+	// Return the name of the city and its population
 	fmt.Fprintf(w, "(%v hits) - City: %v, %v inhabitants", n, name, population)
 }
