@@ -2,7 +2,7 @@
 A simple app to trace.
 
 ## Prerequisites
-1. Install `docker` and `docker-compose`
+1. Install `docker` and `docker-compose` (you can try `sudo pip install docker-compose`)
 2. (Optional) Install `go` and its [dependency management tool](https://github.com/golang/dep)
 
 ## Usage
