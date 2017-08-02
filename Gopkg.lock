@@ -2,20 +2,14 @@
 
 
 [[projects]]
-  branch = "v1"
-  name = "gopkg.in/bsm/ratelimit.v1"
-  packages = ["."]
-  revision = "db14e161995a5177acef654cb0dd785e8ee8bc22"
-
-[[projects]]
-  name = "gopkg.in/redis.v4"
-  packages = [".","internal","internal/consistenthash","internal/errors","internal/hashtag","internal/pool","internal/proto"]
-  revision = "c938162545c57136fa59879746bc65d0f1db3d1e"
-  version = "v4.2.4"
+  name = "github.com/go-redis/redis"
+  packages = [".","internal","internal/consistenthash","internal/hashtag","internal/pool","internal/proto"]
+  revision = "a8ee44122a3b1763b94fed7d665be56fa0a71080"
+  version = "v6.5.5"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "4850cca1dad4a9a667ddf9dde6769f6865ac28ba41fbd609608ab9b026f505e5"
+  inputs-digest = "ac9d1c86121142fdaa3dabafa8710b1d31fe05f8ce6e0adb21895f094eea61ef"
   solver-name = "gps-cdcl"
   solver-version = 1
