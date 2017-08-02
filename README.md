@@ -10,13 +10,13 @@ A simple app to trace.
 ```
 docker-compose up
 ```
-This command should launch a go minimal server along with a redis and a postgres instance.
+This command should launch a minimal golang server along with a redis and a postgres instance.
 
 2. Go to http://localhost:8080/, you should get something like that:
 ```
 (247 hits) - City: Utrecht, 234323 inhabitants
 ```
-Each time you hit this URL, the go server will return a different city and its population from postgres and will also tell you how many times you hit this endpoint.
+Each time you hit this URL, the golang server will return a different city and its population from postgres and will also tell you how many times you hit this endpoint.
 
 ## Possible issues
 If you encounter some dependency issues, try to run `dep ensure` (make sure you have it installed).
