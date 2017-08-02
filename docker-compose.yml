@@ -1,0 +1,16 @@
+version: "2"
+
+services:
+  app:
+    image: golang:1.9-alpine
+    volumes:
+      - .:/go/src/app
+    working_dir: /go/src/app
+    command: go run main.go
+    links:
+      - redis
+    environment:
+      REDIS_URL: redis:6379
+
+  redis:
+    image: redis:alpine
