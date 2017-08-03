@@ -23,12 +23,10 @@ Each time you hit this URL, the golang server will return a different city and i
 ```
 docker exec -it apmtoyapp_datadog_1 bash
 ```
-
 2. Check the info output of the agent
 ```
 service datadog-agent info
 ```
-
 3. Check that postgres and redis are properly reporting metrics
 ```
  Checks
@@ -48,4 +46,5 @@ service datadog-agent info
 ```
 
 ## Possible issues
-If you encounter some dependency issues, try to run `dep ensure` (make sure you have it installed).
+- If you encounter some dependency issues, try to run `dep ensure` (make sure you have it installed).
+- If you want to make modifications to the datadog image, you have to manually rebuild it with `docker build --no-cache datadog -t apmtoyapp_datadog` for apply them.
