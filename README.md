@@ -18,5 +18,34 @@ This command should launch a minimal golang server along with a redis and a post
 ```
 Each time you hit this URL, the golang server will return a different city and its population from postgres and will also tell you how many times you hit this endpoint.
 
+## Check datadog-agent status
+1. Connect to the container running the datadog-agent
+```
+docker exec -it apmtoyapp_datadog_1 bash
+```
+
+2. Check the info output of the agent
+```
+service datadog-agent info
+```
+
+3. Check that postgres and redis are properly reporting metrics
+```
+ Checks
+  ======
+
+    postgres (5.16.0)
+    -----------------
+      - instance #0 [OK]
+      - Collected 15 metrics, 0 events & 1 service check
+
+    redisdb (5.16.0)
+    ----------------
+      - instance #0 [OK]
+      - Collected 36 metrics, 0 events & 1 service check
+      - Dependencies:
+          - redis: 2.10.5
+```
+
 ## Possible issues
 If you encounter some dependency issues, try to run `dep ensure` (make sure you have it installed).
