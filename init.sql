@@ -1,5 +1,8 @@
 BEGIN;
 
+CREATE USER datadog;
+GRANT SELECT ON pg_stat_database TO datadog;
+
 DROP TABLE IF EXISTS city;
 
 CREATE TABLE city (
