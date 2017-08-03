@@ -23,7 +23,7 @@ Each time you hit this URL, the golang server will return a different city and i
 ```
 docker exec -it apmtoyapp_datadog_1 bash
 ```
-2. Check the info output of the agent
+2. Run the info command of the agent
 ```
 service datadog-agent info
 ```
