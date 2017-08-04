@@ -1,6 +1,6 @@
 # How to use Datadog APM
 
-![alt text](![alt text](http://url/to/img.png))
+![This is the trace you should get.](https://github.com/gabsn/apm-toy-app/blob/img/full_trace.png))
 
 1. Trace gorilla/mux requests
 2. Trace redis calls
