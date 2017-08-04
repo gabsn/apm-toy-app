@@ -48,5 +48,6 @@ service datadog-agent info
 ```
 
 ## Possible issues
-- If you encounter some dependency issues, try to run `dep ensure` (make sure you have it installed).
-- If you want to make modifications to the datadog image, you have to manually rebuild it with `docker build --no-cache datadog -t apmtoyapp_datadog` for apply them.
+- If you encounter some dependency issues, try to run `dep ensure` (make sure you have [dep](https://github.com/golang/dep) installed).
+
+- If you want to make modifications to the datadog image, you have to manually rebuild it with `docker build --no-cache datadog -t apmtoyapp_datadog`.
