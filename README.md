@@ -12,7 +12,7 @@ A simple app to trace.
 ```
 docker-compose up
 ```
-This command should launch a minimal golang server along with a redis and a postgres instance.
+This command should launch a minimal golang server along with redis, postgres and the datadog-agent.
 
 2. Go to http://localhost:8080/, you should get something like that:
 ```
