@@ -12,9 +12,9 @@ import (
 )
 
 func main() {
-	router := newRouter()
-	router.HandleFunc("/", router.handler)
-	log.Fatal(http.ListenAndServe(":8080", router))
+	r := newRouter()
+	r.HandleFunc("/", r.handler)
+	log.Fatal(http.ListenAndServe(":8080", r))
 }
 
 type Router struct {

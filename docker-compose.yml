@@ -25,7 +25,7 @@ services:
      - app
     environment:
      - DD_APM_ENABLED=true
-     - API_KEY=62e6170081cd3db36d3792d61945a6fd
+     - API_KEY=06ece0149ad7d455febcfc5cb8811f27
     volumes:
      - /var/run/docker.sock:/var/run/docker.sock
      - /proc/:/host/proc/:ro
