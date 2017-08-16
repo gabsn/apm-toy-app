@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 
+	ht "github.com/DataDog/dd-trace-go/tracer/contrib/net/httptrace"
 	"github.com/go-redis/redis"
 	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"
@@ -14,7 +15,7 @@ import (
 func main() {
 	r := newRouter()
 	r.HandleFunc("/", r.handler)
-	log.Fatal(http.ListenAndServe(":8080", r))
+	log.Fatal(http.ListenAndServe(":8080", ht.NewTraceHandler(r, "web-backend", nil)))
 }
 
 type Router struct {
