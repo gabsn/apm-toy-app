@@ -11,18 +11,21 @@ services:
     links:
       - redis
       - postgres
+      # We need this line to simulate the agent running on the same host than our app
+      - datadog:localhost
+
   redis:
     image: redis:4-alpine
   postgres:
     image: postgres:9.6-alpine
     volumes:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
   datadog:
     build: datadog
     links:
      - redis
      - postgres
-     - app
     environment:
      - DD_APM_ENABLED=true
      - API_KEY=06ece0149ad7d455febcfc5cb8811f27
