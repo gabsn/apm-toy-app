@@ -9,9 +9,10 @@ import (
 	"github.com/DataDog/dd-trace-go/tracer"
 	redistrace "github.com/DataDog/dd-trace-go/tracer/contrib/go-redis"
 	"github.com/DataDog/dd-trace-go/tracer/contrib/net/httptrace"
+	sqltrace "github.com/DataDog/dd-trace-go/tracer/contrib/sqltraced"
 	"github.com/go-redis/redis"
 	"github.com/gorilla/mux"
-	_ "github.com/lib/pq"
+	"github.com/lib/pq"
 )
 
 func main() {
@@ -34,7 +35,7 @@ func newRouter() *Router {
 		Addr: "redis:6379",
 	}, tracer.DefaultTracer, "redis")
 
-	pg, err := sql.Open("postgres", "host=postgres user=postgres dbname=postgres sslmode=disable")
+	pg, err := sqltrace.OpenTraced(&pq.Driver{}, "host=postgres user=postgres dbname=postgres sslmode=disable", "postgres", tracer.DefaultTracer)
 	if err != nil {
 		panic(err)
 	}
@@ -52,7 +53,7 @@ func (r *Router) handler(w http.ResponseWriter, req *http.Request) {
 	n := r.redis.Incr("counter").Val()
 
 	// Get the city associated to this number of hits
-	err := r.pg.QueryRow("SELECT name, population FROM city WHERE id = $1", n%20+1).Scan(&name, &population)
+	err := r.pg.QueryRowContext(req.Context(), "SELECT name, population FROM city WHERE id = $1", n%20+1).Scan(&name, &population)
 	if err != nil {
 		log.Print(err)
 		return
