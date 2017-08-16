@@ -26,7 +26,7 @@ func TestHttpTracerDisabled(t *testing.T) {
 
 	testTracer, testTransport := tracertest.GetTestTracer()
 	testTracer.SetEnabled(false)
-	handler := NewTraceHandler(mux, "service", testTracer)
+	handler := NewHandler(mux, "service", testTracer)
 
 	// Make the request
 	r := httptest.NewRequest("GET", "/disabled", nil)
@@ -107,9 +107,9 @@ func setup(t *testing.T) (*tracer.Tracer, *tracertest.DummyTransport, http.Handl
 	mux.HandleFunc("/500", h500)
 
 	tracer, transport := tracertest.GetTestTracer()
-	handler := NewTraceHandler(mux, "my-service", tracer)
+	traceHandler := NewHandler(mux, "my-service", tracer)
 
-	return tracer, transport, handler
+	return tracer, transport, traceHandler
 }
 
 func handler200(t *testing.T) http.HandlerFunc {
