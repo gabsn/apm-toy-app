@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/DataDog/dd-trace-go/tracer"
+	redistrace "github.com/DataDog/dd-trace-go/tracer/contrib/go-redis"
 	"github.com/DataDog/dd-trace-go/tracer/contrib/net/httptrace"
 	"github.com/go-redis/redis"
 	"github.com/gorilla/mux"
@@ -22,16 +23,16 @@ func main() {
 
 type Router struct {
 	*mux.Router
-	redis *redis.Client
+	redis *redistrace.TracedClient
 	pg    *sql.DB
 }
 
 func newRouter() *Router {
 	r := mux.NewRouter()
 
-	redis := redis.NewClient(&redis.Options{
+	redis := redistrace.NewTracedClient(&redis.Options{
 		Addr: "redis:6379",
-	})
+	}, tracer.DefaultTracer, "redis")
 
 	pg, err := sql.Open("postgres", "host=postgres user=postgres dbname=postgres sslmode=disable")
 	if err != nil {
@@ -43,6 +44,9 @@ func newRouter() *Router {
 
 func (r *Router) handler(w http.ResponseWriter, req *http.Request) {
 	var name, population string
+
+	// Link this call to redis to the previous to the request
+	r.redis.SetContext(req.Context())
 
 	// Count the number of hits on this enpoint
 	n := r.redis.Incr("counter").Val()
