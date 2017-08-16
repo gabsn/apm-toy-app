@@ -8,26 +8,26 @@ import (
 	"github.com/DataDog/dd-trace-go/tracer/ext"
 )
 
-// TraceHandler is a handler that traces all incoming requests.
-// It implements the Handler interface.
-type TraceHandler struct {
-	*tracer.Tracer
+// Handler is a handler that traces all incoming requests.
+// It implements the http.Handler interface.
+type Handler struct {
 	http.Handler
+	*tracer.Tracer
 	service string
 }
 
-// NewTraceHandler allocates and returns a new TraceHandler.
-func NewTraceHandler(h http.Handler, service string, t *tracer.Tracer) *TraceHandler {
+// NewHandler allocates and returns a new Handler.
+func NewHandler(h http.Handler, service string, t *tracer.Tracer) *Handler {
 	if t == nil {
 		t = tracer.DefaultTracer
 	}
 	t.SetServiceInfo(service, "net/http", ext.AppTypeWeb)
-	return &TraceHandler{t, h, service}
+	return &Handler{h, t, service}
 }
 
 // ServeHTTP creates a new span for each incoming request
 // and pass them through the underlying handler.
-func (h *TraceHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// bail out if tracing isn't enabled
 	if !h.Tracer.Enabled() {
 		h.Handler.ServeHTTP(w, r)
@@ -45,36 +45,42 @@ func (h *TraceHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	// pass the span through the request context
 	ctx := span.Context(r.Context())
-	tracedRequest := r.WithContext(ctx)
+	traceRequest := r.WithContext(ctx)
 
 	// trace the response to get the status code
-	tracedWriter := newTracedResponseWriter(w, span)
+	traceWriter := NewResponseWriter(w, span)
 
 	// run the request
-	h.Handler.ServeHTTP(tracedWriter, tracedRequest)
+	h.Handler.ServeHTTP(traceWriter, traceRequest)
 }
 
-// tracedResponseWriter is a small wrapper around an http response writer that will
+// ResponseWriter is a small wrapper around an http response writer that will
 // intercept and store the status of a request.
 // It implements the ResponseWriter interface.
-type tracedResponseWriter struct {
+type ResponseWriter struct {
 	http.ResponseWriter
 	span   *tracer.Span
 	status int
 }
 
-func newTracedResponseWriter(w http.ResponseWriter, span *tracer.Span) *tracedResponseWriter {
-	return &tracedResponseWriter{w, span, 0}
+// New ResponseWriter allocateds and returns a new ResponseWriter.
+func NewResponseWriter(w http.ResponseWriter, span *tracer.Span) *ResponseWriter {
+	return &ResponseWriter{w, span, 0}
 }
 
-func (w *tracedResponseWriter) Write(b []byte) (int, error) {
+// Write writes the data to the connection as part of an HTTP reply.
+// We explicitely call WriteHeader with the 200 status code
+// in order to get it reported into the span.
+func (w *ResponseWriter) Write(b []byte) (int, error) {
 	if w.status == 0 {
 		w.WriteHeader(http.StatusOK)
 	}
 	return w.ResponseWriter.Write(b)
 }
 
-func (w *tracedResponseWriter) WriteHeader(status int) {
+// WriteHeader sends an HTTP response header with status code.
+// It also sets the status code to the span.
+func (w *ResponseWriter) WriteHeader(status int) {
 	w.ResponseWriter.WriteHeader(status)
 	w.status = status
 	w.span.SetMeta(ext.HTTPCode, strconv.Itoa(status))

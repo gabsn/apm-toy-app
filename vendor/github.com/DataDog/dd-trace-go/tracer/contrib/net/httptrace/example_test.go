@@ -3,7 +3,7 @@ package httptrace_test
 import (
 	"net/http"
 
-	ht "github.com/DataDog/dd-trace-go/tracer/contrib/net/httptrace"
+	"github.com/DataDog/dd-trace-go/tracer/contrib/net/httptrace"
 )
 
 func handler(w http.ResponseWriter, r *http.Request) {
@@ -14,5 +14,5 @@ func Example() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", handler)
 
-	http.ListenAndServe(":8080", ht.NewTraceHandler(mux, "web-service", nil))
+	http.ListenAndServe(":8080", httptrace.NewHandler(mux, "web-service", nil))
 }
