@@ -5,7 +5,7 @@ A simple app to trace.
 
 ## Prerequisites
 1. Install `docker` and `docker-compose` (you can try `sudo pip install docker-compose`)
-2. Install `go` and its [dependency management tool](https://github.com/golang/dep)
+2. Install `go` and  [dep](https://github.com/golang/dep) (the dependency management tool we use for this project).
 3. You need a [Datadog account](https://www.datadoghq.com). If you don't have one, just use the free trial. 
 
 ## Get the app running
