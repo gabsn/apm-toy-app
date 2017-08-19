@@ -2,10 +2,16 @@
 
 
 [[projects]]
-  branch = "http-contrib"
+  branch = "develop"
   name = "github.com/DataDog/dd-trace-go"
-  packages = ["tracer","tracer/contrib/net/httptrace","tracer/ext"]
-  revision = "74747698404f2554cf7ac4a6446f4fcc30160dae"
+  packages = ["contrib/database/sql","contrib/database/sql/parsedsn","contrib/database/sql/parsedsn/mysql","contrib/database/sql/parsedsn/pq","contrib/go-redis/redis","contrib/gorilla/mux","contrib/net/http","tracer","tracer/ext"]
+  revision = "4d8994c036071271e3654a287808872c204babd8"
+
+[[projects]]
+  name = "github.com/cihub/seelog"
+  packages = ["."]
+  revision = "d2c6e5aa9fbfdd1c624e140287063c7730654115"
+  version = "v2.6"
 
 [[projects]]
   name = "github.com/go-redis/redis"
@@ -41,11 +47,11 @@
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["windows"]
-  revision = "9f7170bcd8e9f4d3691c06401119c46a769a1e03"
+  revision = "43e60d72a8e2bd92ee98319ba9a384a0e9837c08"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "27c543ac85a16d4bb74fde56ee6be8476911b52d6622abcb03cafc8b81f76da1"
+  inputs-digest = "90b81b3c456ca9e2db6c63204ea4ea257966dc403ef213fd0d85f40a4606d763"
   solver-name = "gps-cdcl"
   solver-version = 1
