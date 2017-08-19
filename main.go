@@ -6,9 +6,12 @@ import (
 	"log"
 	"net/http"
 
+	sqltrace "github.com/DataDog/dd-trace-go/contrib/database/sql"
+	redistrace "github.com/DataDog/dd-trace-go/contrib/go-redis/redis"
+	muxtrace "github.com/DataDog/dd-trace-go/contrib/gorilla/mux"
+
 	"github.com/go-redis/redis"
-	"github.com/gorilla/mux"
-	_ "github.com/lib/pq"
+	"github.com/lib/pq"
 )
 
 func main() {
@@ -18,19 +21,19 @@ func main() {
 }
 
 type Router struct {
-	*mux.Router
-	redis *redis.Client
+	*muxtrace.Router
+	redis *redistrace.Client
 	pg    *sql.DB
 }
 
 func newRouter() *Router {
-	r := mux.NewRouter()
+	r := muxtrace.NewRouter("web-api")
 
-	redis := redis.NewClient(&redis.Options{
+	redis := redistrace.NewClient(&redis.Options{
 		Addr: "redis:6379",
-	})
+	}, "redis")
 
-	pg, err := sql.Open("postgres", "host=postgres user=postgres dbname=postgres sslmode=disable")
+	pg, err := sqltrace.Open(&pq.Driver{}, "host=postgres user=postgres dbname=postgres sslmode=disable", "postgres")
 	if err != nil {
 		panic(err)
 	}
@@ -41,11 +44,14 @@ func newRouter() *Router {
 func (r *Router) handler(w http.ResponseWriter, req *http.Request) {
 	var name, population string
 
+	// Link the redis call to the previous request
+	r.redis.SetContext(req.Context())
+
 	// Count the number of hits on this enpoint
 	n := r.redis.Incr("counter").Val()
 
 	// Get the city associated to this number of hits
-	err := r.pg.QueryRow("SELECT name, population FROM city WHERE id = $1", n%20+1).Scan(&name, &population)
+	err := r.pg.QueryRowContext(req.Context(), "SELECT name, population FROM city WHERE id = $1", n%20+1).Scan(&name, &population)
 	if err != nil {
 		log.Print(err)
 		return
