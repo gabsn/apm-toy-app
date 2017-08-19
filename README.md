@@ -74,6 +74,10 @@ You should see some traces appear in the Datadog app (`APM > Traces`).
 
 ![traces](https://github.com/gabsn/apm-toy-app/blob/img/traces.png)
 
+4. Congratulations! Now you understand how it works and you can try to trace your own apps (see [here](https://github.com/DataDog/dd-trace-go/tree/master/contrib) all the libraries we support).
+
+If you have any question, feel free to ask it on [#apm](datadoghq.slack.com) on the Datadog public slack.
+
 ## Possible issues
 - If you encounter some dependency issues, try to run `dep ensure` (make sure you have [dep](https://github.com/golang/dep) installed).
 
