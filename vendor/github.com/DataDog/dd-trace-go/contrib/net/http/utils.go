@@ -1,4 +1,4 @@
-package httptrace
+package http
 
 import (
 	"net/http"
@@ -8,35 +8,18 @@ import (
 	"github.com/DataDog/dd-trace-go/tracer/ext"
 )
 
-// Handler is a handler that traces all incoming requests.
-// It implements the http.Handler interface.
-type Handler struct {
-	http.Handler
-	*tracer.Tracer
-	service string
-}
+type ServeHTTP func(http.ResponseWriter, *http.Request)
 
-// NewHandler allocates and returns a new Handler.
-func NewHandler(h http.Handler, service string, t *tracer.Tracer) *Handler {
-	if t == nil {
-		t = tracer.DefaultTracer
-	}
-	t.SetServiceInfo(service, "net/http", ext.AppTypeWeb)
-	return &Handler{h, t, service}
-}
-
-// ServeHTTP creates a new span for each incoming request
-// and pass them through the underlying handler.
-func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+// Trace will trace the request before calling the ServeHTTP function passed in argument.
+func Trace(serveHTTP ServeHTTP, w http.ResponseWriter, r *http.Request, service, resource string, t *tracer.Tracer) {
 	// bail out if tracing isn't enabled
-	if !h.Tracer.Enabled() {
-		h.Handler.ServeHTTP(w, r)
+	if !t.Enabled() {
+		serveHTTP(w, r)
 		return
 	}
 
-	// create a new span
-	resource := r.Method + " " + r.URL.Path
-	span := h.Tracer.NewRootSpan("http.request", h.service, resource)
+	// TODO: get the span from the request context
+	span := t.NewRootSpan("http.request", service, resource)
 	defer span.Finish()
 
 	span.Type = ext.HTTPType
@@ -50,8 +33,8 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// trace the response to get the status code
 	traceWriter := NewResponseWriter(w, span)
 
-	// run the request
-	h.Handler.ServeHTTP(traceWriter, traceRequest)
+	// serve the request to the underlying multiplexer
+	serveHTTP(traceWriter, traceRequest)
 }
 
 // ResponseWriter is a small wrapper around an http response writer that will

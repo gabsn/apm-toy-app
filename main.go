@@ -6,36 +6,34 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/DataDog/dd-trace-go/tracer"
-	redistrace "github.com/DataDog/dd-trace-go/tracer/contrib/go-redis"
-	"github.com/DataDog/dd-trace-go/tracer/contrib/net/httptrace"
-	sqltrace "github.com/DataDog/dd-trace-go/tracer/contrib/sqltraced"
+	sqltrace "github.com/DataDog/dd-trace-go/contrib/database/sql"
+	redistrace "github.com/DataDog/dd-trace-go/contrib/go-redis/redis"
+	muxtrace "github.com/DataDog/dd-trace-go/contrib/gorilla/mux"
+
 	"github.com/go-redis/redis"
-	"github.com/gorilla/mux"
 	"github.com/lib/pq"
 )
 
 func main() {
 	r := newRouter()
 	r.HandleFunc("/", r.handler)
-	traceHandler := httptrace.NewHandler(r, "web-backend", tracer.DefaultTracer)
-	log.Fatal(http.ListenAndServe(":8080", traceHandler))
+	log.Fatal(http.ListenAndServe(":8080", r))
 }
 
 type Router struct {
-	*mux.Router
-	redis *redistrace.TracedClient
+	*muxtrace.Router
+	redis *redistrace.Client
 	pg    *sql.DB
 }
 
 func newRouter() *Router {
-	r := mux.NewRouter()
+	r := muxtrace.NewSereMux("web-api")
 
-	redis := redistrace.NewTracedClient(&redis.Options{
+	redis := redistrace.NewClient(&redis.Options{
 		Addr: "redis:6379",
-	}, tracer.DefaultTracer, "redis")
+	}, "redis")
 
-	pg, err := sqltrace.OpenTraced(&pq.Driver{}, "host=postgres user=postgres dbname=postgres sslmode=disable", "postgres", tracer.DefaultTracer)
+	pg, err := sqltrace.Open(&pq.Driver{}, "host=postgres user=postgres dbname=postgres sslmode=disable", "postgres")
 	if err != nil {
 		panic(err)
 	}
