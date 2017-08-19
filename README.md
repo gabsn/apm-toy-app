@@ -5,16 +5,21 @@ A simple app to trace.
 
 ## Prerequisites
 1. Install `docker` and `docker-compose` (you can try `sudo pip install docker-compose`)
-2. (Optional) Install `go` and its [dependency management tool](https://github.com/golang/dep)
+2. Install `go` and its [dependency management tool](https://github.com/golang/dep)
 3. You need a [Datadog account](https://www.datadoghq.com). If you don't have one, just use the free trial. 
 
 ## Get the app running
-1. Get your Datadog API key (*Integrations > APIs* in the app) and paste it [here](https://github.com/gabsn/apm-toy-app/blob/master/docker-compose.yml#L28)
+1. Get your Datadog API key (`Integrations > APIs` in the app) and paste it [here](https://github.com/gabsn/apm-toy-app/blob/master/docker-compose.yml#L28)
 
 *Note:* each time you'll change your API key, you'll need to rebuild the datadog-agent docker image.
 
-1. Get your Datadog API key (*Integrations > APIs*) and paste it [here](https://github.com/gabsn/apm-toy-app/blob/master/docker-compose.yml#L28)
-2. Run the app
+1. Get your Datadog API key (`Integrations > APIs`) and paste it [here](https://github.com/gabsn/apm-toy-app/blob/master/docker-compose.yml#L28)
+
+2. Get the dependencies
+```
+dep ensure
+```
+And then run the app
 ```
 docker-compose up
 ```
@@ -55,6 +60,19 @@ service datadog-agent info
 4. Go in the Datadog app, *Metrics > Explorer* and check you can see your metrics in the app.
 
 ![metrics explorer](https://github.com/gabsn/apm-toy-app/blob/img/metrics_explorer.png)
+
+## Trace the app
+1. Try to trace the [app](https://github.com/gabsn/apm-toy-app/blob/master/main.go) by yourself. All the libraries we support are in this [directory](https://github.com/DataDog/dd-trace-go/tree/master/contrib).
+
+2. If you're stuck, you can use this [diff](https://github.com/gabsn/apm-toy-app/compare/master...app-traced) to see how to trace the app.
+
+3. If you still can't get any trace in the Datadog app, just checkout on the `app-traced` branch to get the app already traced (*but it's better if you do it yourself, so you can understand the process*).
+
+Once it's done, restart the app (`dep ensure && docker-compose up`) and hit the URL multiple times. 
+
+You should see some traces appear in the Datadog app (`APM > Traces`).
+
+![traces](https://github.com/gabsn/apm-toy-app/blob/img/traces.png)
 
 ## Possible issues
 - If you encounter some dependency issues, try to run `dep ensure` (make sure you have [dep](https://github.com/golang/dep) installed).
